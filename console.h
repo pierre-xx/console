@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <optional>
 #include <mutex>
+#include <sstream>
 
 inline std::mutex log_mtx;
 
@@ -34,8 +35,12 @@ namespace console {
 		SetConsoleTextAttribute(handle, col);
 	}
 
-	void log(const std::string& message, std::optional<level> lvl = std::nullopt) {
+	template<typename T>
+	void log(const T& val, std::optional<level> lvl = std::nullopt) {
 		std::lock_guard<std::mutex> lock(log_mtx);
+
+		std::ostringstream oss;
+		oss << val;
 
 		set_color(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 
@@ -53,6 +58,6 @@ namespace console {
 		}
 
 		set_color(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-		printf("%s\n", message.c_str());
+		printf("%s\n", oss.str().c_str());
 	}
 }
